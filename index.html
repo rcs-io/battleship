@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Battleship — You vs the AI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Battleship</h1>
+    <p class="tagline">You vs. the machine. First to sink the whole fleet wins.</p>
+  </header>
+
+  <main>
+    <div id="status-bar" class="status-bar" role="status" aria-live="polite">
+      Place your ships to begin.
+    </div>
+
+    <section id="setup-panel" class="panel">
+      <h2>Deploy your fleet</h2>
+      <p class="hint">
+        Select a ship, then click a cell on your board to place it.
+        Press <kbd>R</kbd> or the Rotate button to change direction.
+      </p>
+      <ul id="ship-palette" class="ship-palette"></ul>
+      <div class="controls">
+        <button id="rotate-btn" type="button">Rotate (R)</button>
+        <button id="random-btn" type="button">Random layout</button>
+        <button id="clear-btn" type="button">Clear board</button>
+        <button id="start-btn" type="button" disabled>Start battle</button>
+      </div>
+      <div class="board-wrap">
+        <h3>Your waters</h3>
+        <div class="board-frame">
+          <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
+          <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+          <div id="setup-board" class="board board-player" aria-label="Your board"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="battle-panel" class="panel hidden">
+      <div class="battle-grid">
+        <div class="board-wrap">
+          <h3>Your fleet</h3>
+          <div class="board-frame">
+            <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
+            <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+            <div id="player-board" class="board board-player" aria-label="Your board"></div>
+          </div>
+          <ul id="player-fleet-status" class="fleet-status"></ul>
+        </div>
+        <div class="board-wrap">
+          <h3>Enemy waters <span class="hint-inline">— click to fire</span></h3>
+          <div class="board-frame">
+            <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
+            <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+            <div id="enemy-board" class="board board-enemy" aria-label="Enemy board"></div>
+          </div>
+          <ul id="enemy-fleet-status" class="fleet-status"></ul>
+        </div>
+      </div>
+    </section>
+
+    <div id="game-over" class="overlay hidden">
+      <div class="dialog">
+        <h2 id="game-over-title"></h2>
+        <p id="game-over-detail"></p>
+        <button id="play-again-btn" type="button">Play again</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Ships: Carrier 5 · Battleship 4 · Cruiser 3 · Submarine 3 · Destroyer 2</p>
+  </footer>
+
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
