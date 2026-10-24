@@ -12,65 +12,459 @@
     <p class="tagline">You vs. the machine. First to sink the whole fleet wins.</p>
   </header>
 
+  <nav class="tabs" role="tablist" aria-label="Site sections">
+    <button class="tab active" role="tab" aria-selected="true" data-tab="game">Game</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="architecture">Architecture</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="bugs">Bugs &amp; Tests</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="journey">Journey</button>
+  </nav>
+
   <main>
-    <div id="status-bar" class="status-bar" role="status" aria-live="polite">
-      Place your ships to begin.
-    </div>
+    <!-- ============================ GAME TAB ============================ -->
+    <section id="tab-game" class="tab-panel" role="tabpanel">
+      <div id="status-bar" class="status-bar" role="status" aria-live="polite">
+        Place your ships to begin.
+      </div>
 
-    <section id="setup-panel" class="panel">
-      <h2>Deploy your fleet</h2>
-      <p class="hint">
-        Select a ship, then click a cell on your board to place it.
-        Press <kbd>R</kbd> or the Rotate button to change direction.
+      <div id="setup-panel" class="panel">
+        <h2>Deploy your fleet</h2>
+        <p class="hint">
+          Select a ship, then click a cell on your board to place it.
+          Press <kbd>R</kbd> or the Rotate button to change direction.
+        </p>
+        <ul id="ship-palette" class="ship-palette"></ul>
+        <div class="controls">
+          <button id="rotate-btn" type="button">Rotate (R)</button>
+          <button id="random-btn" type="button">Random layout</button>
+          <button id="clear-btn" type="button">Clear board</button>
+          <button id="start-btn" type="button" disabled>Start battle</button>
+        </div>
+        <div class="board-wrap">
+          <h3>Your waters</h3>
+          <div class="board-frame">
+            <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
+            <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+            <div id="setup-board" class="board board-player" aria-label="Your board"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="battle-panel" class="panel hidden">
+        <div class="battle-grid">
+          <div class="board-wrap">
+            <h3>Your fleet</h3>
+            <div class="board-frame">
+              <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
+              <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+              <div id="player-board" class="board board-player" aria-label="Your board"></div>
+            </div>
+            <ul id="player-fleet-status" class="fleet-status"></ul>
+          </div>
+          <div class="board-wrap">
+            <h3>Enemy waters <span class="hint-inline">— click to fire</span></h3>
+            <div class="board-frame">
+              <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
+              <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+              <div id="enemy-board" class="board board-enemy" aria-label="Enemy board"></div>
+            </div>
+            <ul id="enemy-fleet-status" class="fleet-status"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== ARCHITECTURE TAB ======================== -->
+    <section id="tab-architecture" class="tab-panel doc hidden" role="tabpanel">
+      <h2>Architecture</h2>
+      <p>
+        Battleship is a zero-dependency static site — plain HTML, CSS and
+        JavaScript with no build step, so it deploys to any static host
+        (including GitHub Pages) as-is. The code is split into a
+        <strong>pure logic core</strong> that never touches the DOM and a
+        <strong>thin UI layer</strong> that renders it. That split is what makes
+        the game testable: the entire ruleset and AI run under Node without a
+        browser.
       </p>
-      <ul id="ship-palette" class="ship-palette"></ul>
-      <div class="controls">
-        <button id="rotate-btn" type="button">Rotate (R)</button>
-        <button id="random-btn" type="button">Random layout</button>
-        <button id="clear-btn" type="button">Clear board</button>
-        <button id="start-btn" type="button" disabled>Start battle</button>
-      </div>
-      <div class="board-wrap">
-        <h3>Your waters</h3>
-        <div class="board-frame">
-          <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
-          <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
-          <div id="setup-board" class="board board-player" aria-label="Your board"></div>
-        </div>
-      </div>
+
+      <h3>Module map</h3>
+      <figure class="diagram">
+        <svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Module map">
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#93a7c4"/>
+            </marker>
+          </defs>
+          <rect x="40" y="30" width="170" height="58" rx="9" class="dg-box"/>
+          <text x="125" y="53" class="dg-title">index.html</text>
+          <text x="125" y="72" class="dg-sub">markup · boards · tabs</text>
+
+          <rect x="40" y="130" width="170" height="58" rx="9" class="dg-box"/>
+          <text x="125" y="153" class="dg-title">js/ui.js</text>
+          <text x="125" y="172" class="dg-sub">DOM render · events · state</text>
+
+          <rect x="40" y="230" width="170" height="58" rx="9" class="dg-box"/>
+          <text x="125" y="253" class="dg-title">styles.css</text>
+          <text x="125" y="272" class="dg-sub">theme · grid layout</text>
+
+          <rect x="290" y="80" width="180" height="140" rx="9" class="dg-box dg-core"/>
+          <text x="380" y="103" class="dg-title">js/game.js</text>
+          <text x="380" y="122" class="dg-sub">pure logic — no DOM</text>
+          <text x="380" y="146" class="dg-fn">createBoard · placeShip</text>
+          <text x="380" y="164" class="dg-fn">fireAt · allShipsSunk</text>
+          <text x="380" y="182" class="dg-fn">placeFleetRandomly</text>
+          <text x="380" y="200" class="dg-fn">createAI (hunt/target)</text>
+
+          <rect x="540" y="80" width="150" height="70" rx="9" class="dg-box dg-test"/>
+          <text x="615" y="107" class="dg-title">test/game.test.js</text>
+          <text x="615" y="126" class="dg-sub">14 Node tests</text>
+
+          <line x1="125" y1="88" x2="125" y2="130" class="dg-line" marker-end="url(#arr)"/>
+          <line x1="210" y1="159" x2="290" y2="159" class="dg-line" marker-end="url(#arr)"/>
+          <line x1="540" y1="115" x2="470" y2="150" class="dg-line" marker-end="url(#arr)"/>
+        </svg>
+        <figcaption>
+          <code>ui.js</code> is the only module that touches the DOM; it calls
+          <code>game.js</code> for every rules decision. The test suite imports
+          the same <code>game.js</code> the browser loads — no duplication, no
+          mocks.
+        </figcaption>
+      </figure>
+
+      <h3>Data model</h3>
+      <p>A board is a 10×10 grid of cells plus a ship registry:</p>
+      <pre class="code-block">board = {
+  cells[r][c] = { ship: &lt;ship index&gt; | null, hit: bool }
+  ships[]     = { name, length, horizontal, cells[], hits, sunk }
+}</pre>
+      <p>
+        Every shot goes through <code>fireAt(board, row, col)</code>, which
+        returns a small contract both the UI and the AI consume:
+      </p>
+      <pre class="code-block">{ result: 'miss' | 'hit' | 'sunk' | 'repeat', ship? }</pre>
+
+      <h3>Game state machine</h3>
+      <figure class="diagram">
+        <svg viewBox="0 0 720 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Game state machine">
+          <defs>
+            <marker id="arr2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#93a7c4"/>
+            </marker>
+          </defs>
+          <circle cx="100" cy="85" r="48" class="dg-node"/>
+          <text x="100" y="90" class="dg-title">SETUP</text>
+          <circle cx="360" cy="85" r="48" class="dg-node"/>
+          <text x="360" y="90" class="dg-title">BATTLE</text>
+          <circle cx="620" cy="85" r="52" class="dg-node dg-node-end"/>
+          <text x="620" y="82" class="dg-title">GAME</text>
+          <text x="620" y="97" class="dg-title">OVER</text>
+          <line x1="148" y1="85" x2="312" y2="85" class="dg-line" marker-end="url(#arr2)"/>
+          <text x="230" y="72" class="dg-lab">all 5 ships placed</text>
+          <line x1="408" y1="85" x2="568" y2="85" class="dg-line" marker-end="url(#arr2)"/>
+          <text x="488" y="72" class="dg-lab">a fleet is sunk</text>
+          <path d="M 590 128 C 500 175 200 175 115 132" class="dg-line" fill="none" marker-end="url(#arr2)"/>
+          <text x="360" y="162" class="dg-lab">Play again</text>
+        </svg>
+        <figcaption>
+          The <code>state.phase</code> field drives which panel is visible and
+          which inputs are accepted; a <code>state.busy</code> flag blocks
+          player input during the AI's turn.
+        </figcaption>
+      </figure>
+
+      <h3>Anatomy of one turn</h3>
+      <figure class="diagram">
+        <svg viewBox="0 0 720 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Turn sequence">
+          <defs>
+            <marker id="arr3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#93a7c4"/>
+            </marker>
+          </defs>
+          <rect x="30" y="18" width="190" height="46" rx="9" class="dg-box"/>
+          <text x="125" y="38" class="dg-sub">1 · click enemy cell</text>
+          <text x="125" y="55" class="dg-fn">fireAt(enemyBoard)</text>
+          <rect x="265" y="18" width="190" height="46" rx="9" class="dg-box"/>
+          <text x="360" y="38" class="dg-sub">2 · mark + message</text>
+          <text x="360" y="55" class="dg-fn">renderBattle()</text>
+          <rect x="500" y="18" width="190" height="46" rx="9" class="dg-box"/>
+          <text x="595" y="38" class="dg-sub">3 · enemy sunk?</text>
+          <text x="595" y="55" class="dg-fn">allShipsSunk → win</text>
+          <rect x="30" y="140" width="190" height="46" rx="9" class="dg-box"/>
+          <text x="125" y="160" class="dg-sub">6 · mark + message</text>
+          <text x="125" y="177" class="dg-fn">renderBattle()</text>
+          <rect x="265" y="140" width="190" height="46" rx="9" class="dg-box"/>
+          <text x="360" y="160" class="dg-sub">5 · AI fires back</text>
+          <text x="360" y="177" class="dg-fn">fireAt(playerBoard)</text>
+          <rect x="500" y="140" width="190" height="46" rx="9" class="dg-box"/>
+          <text x="595" y="160" class="dg-sub">4 · ~0.5s delay</text>
+          <text x="595" y="177" class="dg-fn">ai.nextShot + recordResult</text>
+          <line x1="220" y1="41" x2="265" y2="41" class="dg-line" marker-end="url(#arr3)"/>
+          <line x1="455" y1="41" x2="500" y2="41" class="dg-line" marker-end="url(#arr3)"/>
+          <path d="M 595 64 L 595 140" class="dg-line" fill="none" marker-end="url(#arr3)"/>
+          <line x1="500" y1="163" x2="455" y2="163" class="dg-line" marker-end="url(#arr3)"/>
+          <line x1="265" y1="163" x2="220" y2="163" class="dg-line" marker-end="url(#arr3)"/>
+        </svg>
+        <figcaption>
+          Every turn mutates the model first, then re-renders both boards from
+          state — there is no DOM bookkeeping that could drift out of sync.
+        </figcaption>
+      </figure>
+
+      <h3>The AI opponent</h3>
+      <p>
+        <code>createAI()</code> is a hunt/target strategy. While
+        <em>hunting</em> it picks from untried cells on a checkerboard parity —
+        every ship of length ≥ 2 covers at least one parity cell, so the fleet
+        is found in at most ~50 probes. After a hit it switches to
+        <em>targeting</em>: the four orthogonal neighbours are queued and tried
+        until the ship sinks. A shot journal guarantees the AI never repeats a
+        cell — a property the test suite asserts across a full 100-shot board.
+      </p>
+
+      <h3>Rendering model</h3>
+      <p>
+        Both boards are rebuilt from state after every change
+        (<code>renderBattle</code>). CSS classes mirror cell state —
+        <code>.ship</code>, <code>.hit</code>, <code>.miss</code>,
+        <code>.sunk-cell</code> — so what you see is always a projection of the
+        model, never a parallel copy of it.
+      </p>
     </section>
 
-    <section id="battle-panel" class="panel hidden">
-      <div class="battle-grid">
-        <div class="board-wrap">
-          <h3>Your fleet</h3>
-          <div class="board-frame">
-            <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
-            <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
-            <div id="player-board" class="board board-player" aria-label="Your board"></div>
-          </div>
-          <ul id="player-fleet-status" class="fleet-status"></ul>
-        </div>
-        <div class="board-wrap">
-          <h3>Enemy waters <span class="hint-inline">— click to fire</span></h3>
-          <div class="board-frame">
-            <div class="axis axis-top"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
-            <div class="axis axis-left"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
-            <div id="enemy-board" class="board board-enemy" aria-label="Enemy board"></div>
-          </div>
-          <ul id="enemy-fleet-status" class="fleet-status"></ul>
-        </div>
+    <!-- ========================== BUGS & TESTS TAB ========================== -->
+    <section id="tab-bugs" class="tab-panel doc hidden" role="tabpanel">
+      <h2>Bugs &amp; Tests</h2>
+      <p>
+        The game was verified on two levels: <strong>14 automated logic
+        tests</strong> under Node covering rules and AI, and a
+        <strong>scripted browser pass</strong> that played a complete game in
+        real Chrome — placement through victory through play-again — with a
+        console-error hook installed (zero errors).
+      </p>
+
+      <h3>Bugs found and fixed</h3>
+
+      <div class="bug-card">
+        <h4>1 · Random fleet placement could leave a corrupt, partial fleet</h4>
+        <p><span class="tag tag-review">code review</span></p>
+        <p>
+          <code>placeFleetRandomly()</code> returned <code>false</code> when a
+          ship exhausted its placement retries — but both callers (Random
+          layout, Start battle) ignored the return. A failure would leave a
+          partially-placed board and a game that could never be won.
+        </p>
+        <p class="fix">
+          <strong>Fix:</strong> the function now resets the board and retries
+          the whole fleet on failure, and both callers check the return value
+          and show a "try again" message instead of starting on a bad board.
+        </p>
       </div>
+
+      <div class="bug-card">
+        <h4>2 · Shot coordinates didn't match standard notation — and the board had no axis labels</h4>
+        <p><span class="tag tag-review">code review</span></p>
+        <p>
+          Status messages like "Hit at B4!" computed the letter from the
+          <em>row</em> and the number from the <em>column</em> — the reverse of
+          standard Battleship notation. The board also had no row/column
+          labels, so the messages referred to coordinates the player couldn't
+          see.
+        </p>
+        <p class="fix">
+          <strong>Fix:</strong> <code>coord()</code> now maps letters to columns
+          and numbers to rows, and labeled axes (A–J across, 1–10 down) were
+          added to all three boards.
+        </p>
+      </div>
+
+      <div class="bug-card">
+        <h4>3 · Your shot result disappeared after ~0.5 seconds</h4>
+        <p><span class="tag tag-ui">browser testing</span></p>
+        <p>
+          The status bar showed your shot outcome for only ~550&nbsp;ms before
+          the AI's reply overwrote it — the result of your own turn was easy to
+          miss entirely.
+        </p>
+        <p class="fix">
+          <strong>Fix:</strong> the player's result is retained and the AI's
+          reply appended, e.g. "Hit at B4!  Enemy fired at G6 — miss." stays
+          until your next shot.
+        </p>
+      </div>
+
+      <div class="bug-card">
+        <h4>4 · Placement preview went stale when rotating mid-hover</h4>
+        <p><span class="tag tag-ui">browser testing</span></p>
+        <p>
+          The green/red placement preview only repainted on
+          <code>mouseenter</code>. Pressing <kbd>R</kbd> while hovering left the
+          old-orientation preview on screen, inviting an invalid placement
+          click.
+        </p>
+        <p class="fix">
+          <strong>Fix:</strong> the last hovered cell is tracked and rotating
+          repaints the preview in the new orientation immediately.
+        </p>
+      </div>
+
+      <h3>Automated test suite</h3>
+      <p>
+        <code>test/game.test.js</code> runs 14 assertions with a seeded RNG so
+        every run is reproducible:
+      </p>
+      <ul class="check-list">
+        <li>board shape and empty initial state</li>
+        <li>ship coordinate generation, both orientations</li>
+        <li>out-of-bounds and overlap placement rejection</li>
+        <li>placement mutates the board correctly; illegal placement mutates nothing</li>
+        <li>random full-fleet placement across 20 seeds — always 5 ships, 17 cells, no overlaps</li>
+        <li>fire results: miss / hit / sunk / repeat, including out-of-bounds shots</li>
+        <li>allShipsSunk only when every ship is down; fleetPlaced gating</li>
+        <li>AI sinks a random fleet within 100 shots over 15 seeds, never repeating a cell</li>
+        <li>AI exhausts a full board with no duplicate shot</li>
+        <li>a simulated full game always terminates with exactly one winner</li>
+      </ul>
+      <pre class="code-block">$ node test/game.test.js
+…
+14 tests passed</pre>
+
+      <h3>Verified in the browser (not bugs)</h3>
+      <ul class="check-list">
+        <li>Clicks on already-fired cells are ignored — no free AI turn.</li>
+        <li>Clicks during the AI's ~0.5 s turn are dropped — no shot queueing.</li>
+        <li>"Start battle" stays disabled until all five ships are placed.</li>
+        <li>Sunk ships render dark red and strike through in the fleet list.</li>
+        <li>The victory/defeat overlay blocks further input; Play again fully resets.</li>
+        <li>Zero console errors across full-game browser sessions.</li>
+      </ul>
     </section>
 
-    <div id="game-over" class="overlay hidden">
-      <div class="dialog">
-        <h2 id="game-over-title"></h2>
-        <p id="game-over-detail"></p>
-        <button id="play-again-btn" type="button">Play again</button>
-      </div>
-    </div>
+    <!-- =========================== JOURNEY TAB ============================ -->
+    <section id="tab-journey" class="tab-panel doc hidden" role="tabpanel">
+      <h2>The journey</h2>
+      <p>
+        How this game went from a one-paragraph brief to a deployed, tested
+        product — every step below actually happened, in this order, during a
+        single Devin session on 2026-10-24.
+      </p>
+
+      <ol class="timeline">
+        <li>
+          <span class="tl-step">1</span>
+          <div>
+            <h4>The brief</h4>
+            <p>
+              "Build a Battleship game we can play online against an AI" —
+              plus two extra deliverables: a documented list of bugs found and
+              fixed, and a public GitHub repo with the code.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="tl-step">2</span>
+          <div>
+            <h4>Architecture first</h4>
+            <p>
+              Chose a zero-build static site (deploys to GitHub Pages as-is)
+              and split the code into a pure <code>game.js</code> logic core —
+              no DOM — and a <code>ui.js</code> rendering layer, so the whole
+              ruleset could be unit-tested under Node.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="tl-step">3</span>
+          <div>
+            <h4>Core logic</h4>
+            <p>
+              Board model, placement rules, firing contract, and the
+              hunt/target AI — parity-checkerboard hunting with a neighbour
+              queue after each hit.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="tl-step">4</span>
+          <div>
+            <h4>Test suite — green on first run</h4>
+            <p>
+              Wrote 14 Node tests with seeded randomness: placement rules,
+              firing/sunk detection, AI shot-uniqueness, and full simulated
+              games. All passed immediately — but that only proved the logic
+              core, not the UI.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="tl-step">5</span>
+          <div>
+            <h4>Self-review pass — 2 bugs</h4>
+            <p>
+              Reviewing the UI code surfaced two real bugs before any browser
+              ran the game: shot coordinates used a reversed, unlabeled
+              convention (fixed and added axis labels), and a failed random
+              placement could silently corrupt the board (fixed with
+              whole-fleet retry + caller checks).
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="tl-step">6</span>
+          <div>
+            <h4>Real browser testing — 2 more bugs</h4>
+            <p>
+              A scripted agent played an entire game in Chrome, recorded on
+              video: every menu, invalid placements, a 24-shot victory, and a
+              play-again reset. It caught two UX bugs the tests couldn't see —
+              your shot result vanished when the AI replied 0.5 s later, and
+              the placement preview went stale when rotating mid-hover. Both
+              were fixed and re-verified on video.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="tl-step">7</span>
+          <div>
+            <h4>Documentation</h4>
+            <p>
+              Wrote <code>DEBUGGING.md</code> (every bug, root cause, and fix —
+              now the Bugs &amp; Tests tab) and a README covering how to run
+              and how the code is organized.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="tl-step">8</span>
+          <div>
+            <h4>Shipped</h4>
+            <p>
+              Pushed to the public repo
+              <a href="https://github.com/rcs-io/battleship">rcs-io/battleship</a>
+              and enabled GitHub Pages — you're reading the result.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="tl-step">9</span>
+          <div>
+            <h4>Iteration: this site</h4>
+            <p>
+              The reviewer asked for the game, architecture, test report and
+              journey in one place — so the single page became this four-tab
+              site, re-testing the game tab after restructure.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </section>
   </main>
+
+  <div id="game-over" class="overlay hidden">
+    <div class="dialog">
+      <h2 id="game-over-title"></h2>
+      <p id="game-over-detail"></p>
+      <button id="play-again-btn" type="button">Play again</button>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <p>Ships: Carrier 5 · Battleship 4 · Cruiser 3 · Submarine 3 · Destroyer 2</p>
@@ -78,5 +472,6 @@
 
   <script src="js/game.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/nav.js"></script>
 </body>
 </html>
